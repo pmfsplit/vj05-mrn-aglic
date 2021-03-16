@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Routing;
 
@@ -10,42 +11,47 @@ namespace Vj05Examples
     {
         private void Send1000Messages(IActorRef actor)
         {
-            foreach (var el in Enumerable.Range(0, 1000))
+            Parallel.ForEach(Enumerable.Range(0, 100000), x =>
             {
                 actor.Tell(new Messages.Empty());
-            }
+            });
+            
+            // foreach (var el in Enumerable.Range(0, 10000))
+            // {
+                // actor.Tell(new Messages.Empty());
+            // }
         }
         public void Start()
         {
             using (var system = ActorSystem.Create("router-examples"))
             {
-                var broadcastProps = Props.Create(() => new CollectorActor())
-                    .WithRouter(new BroadcastPool(5));
-                var broadcastRouter = system.ActorOf(broadcastProps);
-                
-                Console.WriteLine("Broadcast:");
-                Send1000Messages(broadcastRouter);
-               
-                Thread.Sleep(3000);
-                broadcastRouter.Tell(new Messages.Print());
-                Thread.Sleep(1000);
-                
+                // var broadcastProps = Props.Create(() => new CollectorActor())
+                //     .WithRouter(new BroadcastPool(5));
+                // var broadcastRouter = system.ActorOf(broadcastProps);
+                //
+                // Console.WriteLine("Broadcast:");
+                // Send1000Messages(broadcastRouter);
+                //
+                // Thread.Sleep(3000);
+                // broadcastRouter.Tell(new Messages.Print());
+                // Thread.Sleep(1000);
+                //
                 // system.Scheduler.ScheduleTellOnce(TimeSpan.FromSeconds(2), broadcastRouter, new Messages.Print(), system.DeadLetters);
                 
-                var randomProps = Props.Create(() => new CollectorActor())
-                    .WithRouter(new RandomPool(5));
-                var randomRouter = system.ActorOf(randomProps);
-                
-                Console.WriteLine("Random:");
-                Send1000Messages(randomRouter);
-               
-                Thread.Sleep(3000);
-                randomRouter.Tell( new Broadcast( new Messages.Print()));
-                Thread.Sleep(1000);
+                // var randomProps = Props.Create(() => new CollectorActor())
+                //     .WithRouter(new RandomPool(5));
+                // var randomRouter = system.ActorOf(randomProps);
+                //
+                // Console.WriteLine("Random:");
+                // Send1000Messages(randomRouter);
+                //
+                // Thread.Sleep(3000);
+                // randomRouter.Tell( new Broadcast( new Messages.Print()));
+                // Thread.Sleep(1000);
 
 
                 var roundRobinProps = Props.Create(() => new CollectorActor())
-                    .WithRouter(new RoundRobinPool(5));
+                    .WithRouter(new RoundRobinPool(5).WithResizer(new DefaultResizer(1, 15)));
                 var roundRobinRouter = system.ActorOf(roundRobinProps);
                 
                 Console.WriteLine("Round robin:");
@@ -55,16 +61,16 @@ namespace Vj05Examples
                 roundRobinRouter.Tell(new Broadcast( new Messages.Print()));
                 Thread.Sleep(1000);
 
-                var smallestMailboxProps = Props.Create(() => new CollectorActor())
-                    .WithRouter(new SmallestMailboxPool(5));
-                var smallestMailboxRouter = system.ActorOf(smallestMailboxProps);
-                
-                Console.WriteLine("Smallest mailbox:");
-                Send1000Messages(smallestMailboxRouter);
-                
-               
-                Thread.Sleep(3000);
-                smallestMailboxRouter.Tell(new Broadcast(new Messages.Print()));
+                // var smallestMailboxProps = Props.Create(() => new CollectorActor())
+                //     .WithRouter(new SmallestMailboxPool(5));
+                // var smallestMailboxRouter = system.ActorOf(smallestMailboxProps);
+                //
+                // Console.WriteLine("Smallest mailbox:");
+                // Send1000Messages(smallestMailboxRouter);
+                //
+                //
+                // Thread.Sleep(3000);
+                // smallestMailboxRouter.Tell(new Broadcast(new Messages.Print()));
             }
         }
     }
