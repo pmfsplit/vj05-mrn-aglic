@@ -16,6 +16,10 @@
 
 /*/bin
 /*/obj
+*/bin
+*/obj
+*/*/bin
+*/*/obj
 
 # Generated files
 .idea/**/contentModel.xml

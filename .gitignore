@@ -15,9 +15,9 @@
 .idea
 
 packages
-*/bin
-*/obj
-*/bin/Debug/
+*/*/bin
+*/*/obj
+*/*/bin/Debug/
 
 # Generated files
 .idea/**/contentModel.xml
